@@ -34,7 +34,7 @@ def get_movies(request, user):
        soup = BeautifulSoup(search_document._content, 'html.parser')
        scrape_movielist_and_write_to_csv(user, soup)
        no_more_movies_to_export = False
-       if (soup.find_all("li", {"class": "is-movie-wide"}) == []):
+       if (soup.find_all("td", {"class": "plain-list-movie"}) == []):
            no_more_movies_to_export = True
        if (no_more_movies_to_export):
            break
@@ -42,16 +42,15 @@ def get_movies(request, user):
 # find movie infos and write them to csv file
 def scrape_movielist_and_write_to_csv(user, soup):
     movie = {'title': None, 'director': None, 'year': None}
-    movieslist = soup.find_all("li", {"class": "is-movie-wide"})
+    movieslist = soup.find_all("td", {"class": "plain-list-movie"})
     for movie in movieslist:
-        movie['title'] = movie.find("img").get("alt")
+        movie['title'] = movie.find("a").get_text(strip=True)
         date = movie.find_all("span", {"class": "production_info"})
         for d in date:
             chunk = d.get_text()
             date = [int(s) for s in chunk.split() if s.isdigit()]
             movie['year'] = date[0]
-        for rating in movie.select(".rating-value"):
-            movie['rating'] = rating.get("title")
+        movie['rating'] = movie.find_next_sibling().get_text(strip=True)
         write_to_csv(user, movie)
 
 # get moviepilot login
