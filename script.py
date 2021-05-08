@@ -1,4 +1,6 @@
 #imports
+from os import path
+import configparser
 import requests
 from bs4 import BeautifulSoup
 import csv
@@ -6,6 +8,17 @@ import csv
 LOGIN_URL = "https://www.moviepilot.de/login?next="
 SESSION_POST_URL="https://www.moviepilot.de/api/session"
 SEARCH_URI = "https://www.moviepilot.de/users/%s/rated/movies?page=%d"
+
+# load config
+def get_config():
+    config = configparser.ConfigParser()
+    config_path = path.join(path.dirname(path.realpath(__file__)), 'config.ini')
+    config.read(config_path)    
+    return {
+        'username': config['login']['username'],
+        'password': config['login']['password'],
+        'userToParse': config['config']['userToParse']
+    }
 
 # create a csv file
 def create_csv(user):
@@ -64,15 +77,15 @@ def get_mp_password():
     return password
 
 # create a moviepilot session with given credentials
-def login_to_moviepilot():
+def login_to_moviepilot(u, p):
     # request session request
     session = requests.session()
 
     # request login url
     session.get(LOGIN_URL)
 
-    username = get_mp_login()
-    password = get_mp_password()
+    username = u if len(u) > 0 else get_mp_login()
+    password = p if len(p) > 0 else get_mp_password()
     
     # create session request payload
     payload = {
@@ -91,10 +104,14 @@ def get_user():
     return user.lower().strip()
 
 def main():
-    session = login_to_moviepilot()
+    # get config from file
+    config = get_config()
+    
+    # login
+    session = login_to_moviepilot(config['username'], config['password'])
 
-    # ask for user to export movielist for
-    user = get_user()
+    # get user to export movielist for
+    user = config['userToParse'].lower() if len(config['userToParse']) > 0 else get_user()
 
     # prepare csv for user
     create_csv(user)

@@ -26,6 +26,8 @@
 
 ### Usage
 
+Set values in config.ini file - this is optional.
+
 Run the script, enter moviepilot credentials and username you want to export watched movies for.
 
 You'll have to wait until the script has finisched scraping the pages from moviepilot. A file is creating beside the script file with the name of the user you exported movies for.
