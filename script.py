@@ -22,13 +22,15 @@ def get_config():
 
 # create a csv file
 def create_csv(user):
-    with open(str(user) + '.csv', 'w', encoding='UTF-8') as f:
+    csv_path = path.join(path.dirname(path.realpath(__file__)), str(user) + '.csv')
+    with open(csv_path, 'w', encoding='UTF-8', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(('Title','Year','Rating10'))
 
 # write to previously created csv file
 def write_to_csv(user, movie):
-    with open(str(user) + '.csv', 'a', encoding='UTF-8') as f:
+    csv_path = path.join(path.dirname(path.realpath(__file__)), str(user) + '.csv')
+    with open(csv_path, 'a', encoding='UTF-8', newline='') as f:
         writer = csv.writer(f)
         writer.writerow((
           movie['title'],
